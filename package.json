@@ -1,0 +1,7 @@
+{
+  "name": "memleak",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Takuma Suzuki <pferd262@gmail.com>",
+  "license": "MIT"
+}
