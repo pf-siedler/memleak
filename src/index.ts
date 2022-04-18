@@ -2,24 +2,25 @@ import Koa from 'koa';
 import { promisify } from 'util';
 import * as http from 'http';
 import Router from 'koa-router';
-import { SomeClassUsesAxios } from './SomeClassUsesAxios';
+import { AlwaysCreateInstance, SomeClassUsesAxios } from './SomeClassUsesAxios';
 //import { AxiosInstance } from 'axios';
 
 type StateT = Record<string, never>;
 type CustomT = {
     dep: SomeClassUsesAxios;
 };
-//type Middleware = Koa.Middleware<StateT, CustomT>;
+type Middleware = Koa.Middleware<StateT, CustomT>;
 
-//function mkMiddleware(/*inst: AxiosInstance*/):Middleware {
-//    return async function middleware(ctx, next) {
-//        // middleware で毎回 SomeClassUsesAxios のインスタンスを作る
-//        ctx.dep = new AlwaysCreateInstance();
-//
-//        //ctx.dep = new GetInstanceFromArgs(inst);
-//        return await next();
-//    }
-//}
+function mkMiddleware():Middleware {
+    return async function middleware(ctx, next) {
+        // middleware で毎回 SomeClassUsesAxios のインスタンスを作る
+        ctx.dep = new AlwaysCreateInstance();
+
+        // 外部で作成した AxiosInstance を注入する
+        //ctx.dep = new GetInstanceFromArgs(inst);
+        return await next();
+    }
+}
 
 
 export function mkApiRouter(router: Router<StateT, CustomT>): Router<StateT, CustomT> {
@@ -47,7 +48,7 @@ export async function mkApp(): Promise<void> {
 
     const router = new Router<StateT, CustomT>();
 
-    //router.use(mkMiddleware() as any)
+    router.use(mkMiddleware() as any)
 
     app.use(mkApiRouter(router).routes());
 
